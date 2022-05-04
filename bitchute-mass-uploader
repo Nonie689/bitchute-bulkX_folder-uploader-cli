@@ -14,13 +14,13 @@ mkdir ${folder}/finished_transfer_movies &> /dev/null
 for file in ${folder}/*;
   do
    #file=$(echo ${file} |  awk -F "+=+" '{ print $1 }') 
-   if ! $(echo $file|grep /finished_transfer_movies); then
+   if ! $(echo $file | grep -e "finished_transfer_movies") && ! $(file "$file" | grep directory) && ! $(file "$file" | grep empty) && ! $(echo $file | grep -e "[mp4|mkv|mpeg|mpg|wmv|mov]*.part") && ! $(file "$file" | grep empty) && ! $(echo $file | grep -e ".txt") && ! $(echo $file | grep -e ".m4a"); then
       echo "$file"
       name_clear=$(basename "${file}")
       name=$(echo "${name_clear}" | sed 's/.mp4//g')
       echo $name_clear
       echo $name
-      task_cmd="python ${app_path}/bitchute-uploader.py -f '${file}' -n '${name}' -t '${thumbnail}' -e '${email}' -p '${password}' -v '${visbly_advice}' && mv '${file}' '${folder}/finished_transfer_movies/${name_clear}'"
+      task_cmd="python ${app_path}/bitchute-uploader.py -f '${file}' -n '${name}' -t '${thumbnail}' -e '${email}' -p '${password}' -v '${visibly_advice}' && mv \"${file}\" \"${folder}/finished_transfer_movies/${name_clear}\""
       echo $task_cmd
       sem -j +0 "$task_cmd"
    fi
