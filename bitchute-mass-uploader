@@ -11,19 +11,31 @@ mkdir ${folder}/finished_transfer_movies &> /dev/null
 
 #find ${folder} -type f -print0 |
 #while read -r -d '' file
-for file in ${folder}/*;
-  do
-   #file=$(echo ${file} |  awk -F "+=+" '{ print $1 }') 
-   if ! $(echo $file | grep -e "finished_transfer_movies") && ! $(file "$file" | grep directory) && ! $(file "$file" | grep empty) && ! $(echo $file | grep -e "[mp4|mkv|mpeg|mpg|wmv|mov]*.part") && ! $(file "$file" | grep empty) && ! $(echo $file | grep -e ".txt") && ! $(echo $file | grep -e ".m4a"); then
-      echo "$file"
-      name_clear=$(basename "${file}")
-      name=$(echo "${name_clear}" | sed 's/.mp4//g')
-      echo $name_clear
-      echo $name
-      task_cmd="python ${app_path}/bitchute-uploader.py -f '${file}' -n '${name}' -t '${thumbnail}' -e '${email}' -p '${password}' -v '${visibly_advice}' && mv \"${file}\" \"${folder}/finished_transfer_movies/${name_clear}\""
-      echo $task_cmd
-      sem -j +0 "$task_cmd"
-   fi
-done
-sem --wait
+while true; do
+  for file in ${folder}/*.mkv ${folder}/*.mp4 ${folder}/*.mpeg ${folder}/*.mpg ${folder}/*.wmv ${folder}/*.mov;
+    do
+     #file=$(echo ${file} |  awk -F "+=+" '{ print $1 }') 
+     if ! $(echo $file | grep -e "finished_transfer_movies") && ! $(file "$file" | grep directory) && ! $(file "$file" | grep empty); then
+        name_clear=$(basename "${file}")
+        name=$(echo "${name_clear}" | sed -E 's/(.mkv|.mp4|.mpeg|.mpg|.wmv|.mov)+//g')
+        echo "Filename: $file"
+        echo "Upload Video Title: $name"
+        echo
+        task_cmd="python ${app_path}/bitchute-uploader.py -f '${file}' -n '${name}' -t '${thumbnail}' -e '${email}' -p '${password}' -v '${visibly_advice}' && mv \"${file}\" \"${folder}/finished_transfer_movies/${name_clear}\"; echo"
+        sem -j +0 "$task_cmd"
+     fi
+  done
+  sem --wait
 
+  echo
+  echo " ** Recheck folder content"
+  if $(find ${folder} -maxdepth 1 -type f -not -name 't_*'|wc -l) -eq 0 ; then
+    if ! $infinite_run_mode; then
+       echo " ** No Video content found! All done!"
+       break
+    else
+       echo " ** No Video content found! Recheck for content in 1 minute!"
+       sleep 60
+    fi
+  fi
+done
