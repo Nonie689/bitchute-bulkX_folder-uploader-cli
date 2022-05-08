@@ -43,11 +43,23 @@ class TestBitchuteUploadClass(object):
     self.driver.quit()
   
   def test_bitchuteUploadClass(self):
-     self.driver.get("https://www.bitchute.com/")
+     while True:
+        try:
+           self.driver.get("https://www.bitchute.com/")
+           print(" ** Connection to bitchute.com succeeds!")
+        except:
+           time.sleep(2.0)
+           print(" ** Network connection failure!!")
+           time.sleep(4.0)
+           print(" ** Retry connecting to bitchute.com!")
+           continue
+        else:
+           break
+        
      while True:
        try:
           self.driver.set_window_size(880, 640)
-          self.driver.set_window_position(50, 50)
+          self.driver.set_window_position(90, 90)
        except:
           continue
        else:
@@ -116,7 +128,10 @@ class TestBitchuteUploadClass(object):
              except:
                 try:
                    WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[7]")))
-                   self.driver.find_element(By.XPATH, "(//button[@type=\'button\'])[7]").click()
+                   self.driver.find_element(By.CSS_SELECTOR, ".filepond--action-remove-item").click()
+                   WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id=\'videoInput\']/div/label")))
+                   self.driver.find_element(By.NAME, "thumbnailInput").send_keys(self.thumb)
+                   #self.driver.find_element(By.XPATH, "(//button[@type=\'button\'])[7]").click()
                    continue
                 except:
                    continue
