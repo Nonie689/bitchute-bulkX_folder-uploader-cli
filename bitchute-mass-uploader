@@ -8,28 +8,46 @@ source ${app_path}/config.ini
 
 mkdir ${folder}/finished_transfer_movies &> /dev/null
 
+netcon_failure() {
+  echo
+  echo " ** No Internet connection! -- Please check your Internet settings!"
+  echo " ** Retry Upload in 10 seconds!"
+  sleep 10
+  echo
+  echo " ** Retry connect to bitchute.com!"
+}
 
-#find ${folder} -type f -print0 |
-#while read -r -d '' file
+echo "Bitchute Mass uploader started!"
+echo
+
 while true; do
   for file in ${folder}/*.mkv ${folder}/*.mp4 ${folder}/*.mpeg ${folder}/*.mpg ${folder}/*.wmv ${folder}/*.mov;
     do
-     #file=$(echo ${file} |  awk -F "+=+" '{ print $1 }') 
-     if ! $(echo $file | grep -e "finished_transfer_movies") && ! $(file "$file" | grep directory) && ! $(file "$file" | grep empty); then
+     if ! $(file "$file" | grep empty) &> /dev/null ; then
         name_clear=$(basename "${file}")
         name=$(echo "${name_clear}" | sed -E 's/(.mkv|.mp4|.mpeg|.mpg|.wmv|.mov)+//g')
-        echo "Filename: $file"
-        echo "Upload Video Title: $name"
-        echo
-        task_cmd="python ${app_path}/bitchute-uploader.py -f '${file}' -n '${name}' -t '${thumbnail}' -e '${email}' -p '${password}' -v '${visibly_advice}' && mv \"${file}\" \"${folder}/finished_transfer_movies/${name_clear}\"; echo"
-        sem -j +0 "$task_cmd"
+
+        if [ "$name" != "*" ]; then
+          echo "Check Internet connection!"
+          while true; do
+            curl https://bitchute.com &> /dev/null && break || netcon_failure
+          done
+          echo
+          echo " ** Internet works! Could connect to Bitchute.com!"
+          echo " ** Start Upload -"
+          echo
+          echo "Filename: $file"
+          echo "Upload Video Title: $name"
+          echo
+          task_cmd="python ${app_path}/bitchute-uploader.py -f '${file}' -n '${name}' -t '${thumbnail}' -e '${email}' -p '${password}' -v '${visibly_advice}' && mv \"${file}\" \"${folder}/finished_transfer_movies/${name_clear}\"; echo"
+          sem -j +0 "$task_cmd"
+        fi
      fi
   done
   sem --wait
-
   echo
-  echo " ** Recheck folder content"
-  if $(find ${folder} -maxdepth 1 -type f -not -name 't_*'|wc -l) -eq 0 ; then
+  echo " ** Restart Video content searching sequence!"
+  if [ $(find ${folder} -maxdepth 1 -type f -not -name 't_*' | grep -E "(.mkv|.mp4|.mpeg|.mpg|.wmv|.mov)" | wc -l) -eq 0 ] ; then
     if ! $infinite_run_mode; then
        echo " ** No Video content found! All done!"
        break
@@ -37,5 +55,9 @@ while true; do
        echo " ** No Video content found! Recheck for content in 1 minute!"
        sleep 60
     fi
+  else
+    echo " ** Found $(find ${folder} -maxdepth 1 -type f -not -name 't_*' | grep -E "(.mkv|.mp4|.mpeg|.mpg|.wmv|.mov)" | wc -l) Videos!"
+    echo " ** Uploading Video files!"
   fi
+  echo
 done
