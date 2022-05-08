@@ -163,6 +163,7 @@ class TestBitchuteUploadClass(object):
               time.sleep(2.0)
               self.driver.find_element(By.XPATH, "//button[@type=\'submit\']").click()
            else:
+              print("Upload is complete and succeeds!")
               break
         except:
            continue
