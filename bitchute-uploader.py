@@ -47,9 +47,10 @@ class TestBitchuteUploadClass(object):
         try:
            self.driver.get("https://www.bitchute.com/")
            print(" ** Connection to bitchute.com succeeds!")
+           print(" ** Upload Video: " + self.name + "!")
         except:
            time.sleep(2.0)
-           print(" ** Network connection failure!!")
+           print(" ** Network connection failure!")
            time.sleep(4.0)
            print(" ** Retry connecting to bitchute.com!")
            continue
@@ -174,7 +175,7 @@ class TestBitchuteUploadClass(object):
               time.sleep(2.0)
               self.driver.find_element(By.XPATH, "//button[@type=\'submit\']").click()
            else:
-              print("Upload is complete and succeeds!")
+              print("Upload of: " + self.name + " is complete and succeeds!")
               break
         except:
            continue
