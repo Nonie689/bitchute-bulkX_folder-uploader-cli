@@ -69,24 +69,20 @@ class TestBitchuteUploadClass(object):
         WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, ".fa-upload > path")))
         self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
 
-        ## Check 3 times the bitchute subdomain loading - (Trying to go to Upload page!)
-        time.sleep(6.0)
-        title = self.driver.title
-        if title != "Upload":
-           time.sleep(6.0)
+        ## Check bitchute subdomain loading - (Trying to go to Upload page!)
+        while True:
+           time.sleep(2.0)
            title = self.driver.title
-           if title != "Upload":
-              time.sleep(6.0)
-              title = self.driver.title
-              if title != "Upload":
-                 self.driver.back()
-                 continue
-              else:
-                 break
-           else:
+           if title == "Upload":
               break
-        else:
-           break
+           elif title == "BitChute":
+              continue
+           else:
+              self.driver.back()
+              time.sleep(8.0)
+              self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
+              contiue
+        break
 
     ## Continue workflow <- No failure on bitchute subdomain loading!
      while True:
@@ -171,9 +167,9 @@ class TestBitchuteUploadClass(object):
      time.sleep(4.0)
      while True:
         try:
-           self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
+           self.driver.find_element(By.CSS_SELECTOR, "#notifylink path").click()
            title = self.driver.title
-           if title == "Upload":
+           if title == "Notifications - BitChute":
               self.driver.close()
               break
            else:
