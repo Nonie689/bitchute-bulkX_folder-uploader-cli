@@ -114,19 +114,19 @@ class TestBitchuteUploadClass(object):
           WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id=\'videoInput\']/div/label")))
           self.driver.find_element(By.NAME, "thumbnailInput").send_keys(self.thumb)
           time.sleep(5.0)
-          try:
-             WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[7]")))
-          except:
-             while True:
+          while True:
+             try:
+                WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[8]")))
+             except:
                 try:
-                   WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[8]")))
+                   WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[7]")))
+                   self.driver.find_element(By.XPATH, "(//button[@type=\'button\'])[7]").click()
+                   continue
                 except:
                    continue
-                else:
-                   break
+             else:
+                break
              break
-          else:
-             continue
        except:
           continue
        else:
@@ -137,19 +137,19 @@ class TestBitchuteUploadClass(object):
           WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id=\'videoInput\']/div/label")))
           self.driver.find_element(By.NAME, "videoInput").send_keys(self.file)
           time.sleep(5.0)
-          try:
-             WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[6]")))
-          except:
-             while True:
+          while True:
+             try:
+                WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[7]")))
+             except:
                 try:
-                    WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[7]")))
+                    WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[6]")))
+                    self.driver.find_element(By.XPATH, "(//button[@type=\'button\'])[6]").click()
+                    continue
                 except:
                     continue
-                else:
-                    break
+             else:
+                break
              break
-          else:
-             continue
        except:
           continue
        else:
@@ -157,30 +157,28 @@ class TestBitchuteUploadClass(object):
 
      while True:
         try:
-          title = self.driver.title
-          if title == "Upload":
-             print(title)
-             time.sleep(5.0)
-             self.driver.find_element(By.XPATH, "//button[@type=\'submit\']").click()
-          else:
-             break
+           title = self.driver.title
+           if title == "Upload":
+              print("Click Upload Bottum")
+              time.sleep(2.0)
+              self.driver.find_element(By.XPATH, "//button[@type=\'submit\']").click()
+           else:
+              break
         except:
-          break
-        else:
-          continue
+           continue
 
      time.sleep(4.0)
      while True:
-       try:
-         self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
-         title = self.driver.title
-         if title == "Upload":
-            self.driver.close()
-            break
-         else:
-            continue
-       except:
-         continue
+        try:
+           self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
+           title = self.driver.title
+           if title == "Upload":
+              self.driver.close()
+              break
+           else:
+              continue
+        except:
+           continue
   
 Bitchute = TestBitchuteUploadClass(args.name, args.file, args.thumbnail, args.email, args.password, args.visibly_advice)
 
