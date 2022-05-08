@@ -3,6 +3,7 @@
 readonly script="$0"
 readonly app_path="$(dirname $script)"
 readonly folder="$@"
+readonly debug=false
 
 source ${app_path}/config.ini
 
@@ -39,7 +40,11 @@ while true; do
           echo "Filename: $file"
           echo "Upload Video Title: $name"
           echo
-          task_cmd="python ${app_path}/bitchute-uploader.py -f '${file}' -n '${name}' -t '${thumbnail}' -e '${email}' -p '${password}' -v '${visibly_advice}' && mv \"${file}\" \"${folder}/finished_transfer_movies/${name_clear}\"; echo"
+          task_cmd="python \"${app_path}/bitchute-uploader.py\" -f \"${file}\" -n \"${name}\" -t \"${thumbnail}\" -e \"${email}\" -p \"${password}\" -v ${visibly_advice} && mv \"${file}\" \"${folder}/finished_transfer_movies/${name_clear}\"; echo"
+          task_cmd_asterix="python \"${app_path}/bitchute-uploader.py\" -f '${file}\" -n \"${name}\" -t \"${thumbnail}\" -e \"${email}\" -p \"**********\" -v ${visibly_advice}"
+          if $debug; then
+             echo $task_cmd_asterix
+          fi
           sem -j +0 "$task_cmd"
         fi
      fi
