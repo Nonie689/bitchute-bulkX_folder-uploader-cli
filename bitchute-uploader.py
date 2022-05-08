@@ -79,8 +79,14 @@ class TestBitchuteUploadClass(object):
         #self.driver.get("https://www.bitchute.com/")
 
         # Go to upload page if possible!
-        WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, ".fa-upload > path")))
-        self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
+        while True:
+           try:
+              WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, ".fa-upload > path")))
+              self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
+           except:
+               continue
+           else:
+               break
 
         ## Check bitchute subdomain loading - (Trying to go to Upload page!)
         while True:
