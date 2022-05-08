@@ -36,7 +36,7 @@ class TestBitchuteUploadClass(object):
   def setup_method(self, method):
     options = Options()
     options.add_argument("start-minimized")
-    self.driver = webdriver.Chrome(chrome_options=options)
+    self.driver = webdriver.Chrome(options=options)
     self.vars = {}
   
   def teardown_method(self, method):
@@ -65,18 +65,18 @@ class TestBitchuteUploadClass(object):
      while True:
         #self.driver.get("https://www.bitchute.com/")
 
-        # Go to uplpsd page if possible!
+        # Go to upload page if possible!
         WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, ".fa-upload > path")))
         self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
 
         ## Check 3 times the bitchute subdomain loading - (Trying to go to Upload page!)
-        time.sleep(4.0)
+        time.sleep(6.0)
         title = self.driver.title
         if title != "Upload":
-           time.sleep(4.0)
+           time.sleep(6.0)
            title = self.driver.title
            if title != "Upload":
-              time.sleep(4.0)
+              time.sleep(6.0)
               title = self.driver.title
               if title != "Upload":
                  self.driver.back()
@@ -100,6 +100,8 @@ class TestBitchuteUploadClass(object):
      while True:
        try:
          self.driver.find_element(By.XPATH, "//input[@id=\'title\']").send_keys(self.name)
+         self.driver.find_element(By.XPATH, "//input[@id=\'title\']").click()
+         self.driver.find_element(By.XPATH, "//option[@value=\'"+ self.visibly_advice + "\']").click()
        except:
           continue
        else:
@@ -110,13 +112,44 @@ class TestBitchuteUploadClass(object):
      while True:
        try:
           WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id=\'videoInput\']/div/label")))
-          WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "//button[contains(.,\'Proceed\')]")))
-          self.driver.find_element(By.XPATH, "//input[@id=\'title\']").click()
-          self.driver.find_element(By.XPATH, "//option[@value=\'"+ self.visibly_advice + "\']").click()
-          self.driver.find_element(By.NAME, "videoInput").send_keys(self.file)
           self.driver.find_element(By.NAME, "thumbnailInput").send_keys(self.thumb)
-          WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "//button[contains(.,\'Proceed\')]")))         
-          WebDriverWait(self.driver, 300000000000000000000000000000000000000000000000).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[7]")))
+          time.sleep(5.0)
+          try:
+             WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[7]")))
+          except:
+             while True:
+                try:
+                   WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[8]")))
+                except:
+                   continue
+                else:
+                   break
+             break
+          else:
+             continue
+       except:
+          continue
+       else:
+          break
+
+     while True:
+       try:
+          WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "//div[@id=\'videoInput\']/div/label")))
+          self.driver.find_element(By.NAME, "videoInput").send_keys(self.file)
+          time.sleep(5.0)
+          try:
+             WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[6]")))
+          except:
+             while True:
+                try:
+                    WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "(//button[@type=\'button\'])[7]")))
+                except:
+                    continue
+                else:
+                    break
+             break
+          else:
+             continue
        except:
           continue
        else:
@@ -137,7 +170,17 @@ class TestBitchuteUploadClass(object):
           continue
 
      time.sleep(4.0)
-     self.driver.close()
+     while True:
+       try:
+         self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
+         title = self.driver.title
+         if title == "Upload":
+            self.driver.close()
+            break
+         else:
+            continue
+       except:
+         continue
   
 Bitchute = TestBitchuteUploadClass(args.name, args.file, args.thumbnail, args.email, args.password, args.visibly_advice)
 
