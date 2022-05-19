@@ -8,7 +8,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
@@ -34,9 +34,7 @@ class TestBitchuteUploadClass(object):
     self.visibly_advice = visibly_advice
 
   def setup_method(self, method):
-    options = Options()
-    options.add_argument("start-minimized")
-    self.driver = webdriver.Chrome(options=options)
+    self.driver = webdriver.Chrome()
     self.vars = {}
   
   def teardown_method(self, method):
@@ -59,6 +57,7 @@ class TestBitchuteUploadClass(object):
         
      while True:
        try:
+          self.driver.minimize_window()
           self.driver.set_window_size(880, 640)
           self.driver.set_window_position(90, 90)
        except:
@@ -67,56 +66,46 @@ class TestBitchuteUploadClass(object):
           break
 
      ## Login process
-     self.driver.find_element(By.LINK_TEXT, "Login").click()
-     WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "//input[@id=\'id_username\']")))
-     self.driver.find_element(By.XPATH, "//input[@id=\'id_username\']").click()
-     self.driver.find_element(By.CSS_SELECTOR, "#id_username").send_keys(self.email)
-     self.driver.find_element(By.XPATH, "//input[@id=\'id_password\']").click()
-     self.driver.find_element(By.CSS_SELECTOR, "#id_password").send_keys(self.password)
-     self.driver.find_element(By.ID, "auth_submit").click()
-     # Re-open Bitchute baseurl!
      while True:
-        #self.driver.get("https://www.bitchute.com/")
-
+        try:
+           self.driver.find_element(By.LINK_TEXT, "Login").click()
+           WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.XPATH, "//input[@id=\'id_username\']")))
+           self.driver.find_element(By.XPATH, "//input[@id=\'id_username\']").click()
+           self.driver.find_element(By.CSS_SELECTOR, "#id_username").send_keys(self.email)
+           self.driver.find_element(By.XPATH, "//input[@id=\'id_password\']").click()
+           self.driver.find_element(By.CSS_SELECTOR, "#id_password").send_keys(self.password)
+           #self.driver.set_timeout(60) # seconds
+           self.driver.find_element(By.ID, "auth_submit").click()
+           WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, ".fa-upload > path")))
+        except:
+           continue
+        else:
+           break
+           
+     ## Check bitchute Upload bottom and try to click it - on timeout or failure retry it, till will succeed!
+     while True:
         # Go to upload page if possible!
         while True:
            try:
-              WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, ".fa-upload > path")))
-              self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
+              self.driver.find_element(By.CSS_SELECTOR, ".fa-upload > path").click()
+              #self.driver.set_timeout(60) # seconds
+              WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.ID, "publish")))
+           except TimeoutException as ex:
+               continue
            except:
+               self.driver.back()
                continue
            else:
                break
-
-        ## Check bitchute subdomain loading - (Trying to go to Upload page!)
-        while True:
-           time.sleep(2.0)
-           title = self.driver.title
-           if title == "Upload":
-              break
-           elif title == "BitChute":
-              continue
-           else:
-              self.driver.back()
-              time.sleep(8.0)
-              self.driver.find_element(By.CSS_SELECTOR, ".fa-upload").click()
-              contiue
         break
 
-    ## Continue workflow <- No failure on bitchute subdomain loading!
+    ## If not failure on connectinng to bitchute upload subdomain  page! 
+    ##Continue workflow - on Subdomain with Upload interface!
      while True:
        try:
-          WebDriverWait(self.driver, 30).until(expected_conditions.visibility_of_element_located((By.ID, "publish")))
-       except:
-          continue
-       else:
-          break
-
-     while True:
-       try:
-         self.driver.find_element(By.XPATH, "//input[@id=\'title\']").send_keys(self.name)
-         self.driver.find_element(By.XPATH, "//input[@id=\'title\']").click()
-         self.driver.find_element(By.XPATH, "//option[@value=\'"+ self.visibly_advice + "\']").click()
+          self.driver.find_element(By.XPATH, "//input[@id=\'title\']").send_keys(self.name)
+          self.driver.find_element(By.XPATH, "//input[@id=\'title\']").click()
+          self.driver.find_element(By.XPATH, "//option[@value=\'"+ self.visibly_advice + "\']").click()
        except:
           continue
        else:
