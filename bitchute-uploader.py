@@ -4,6 +4,8 @@ import sys
 import pytest
 import time
 import json
+import os.path
+import shutil
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -23,6 +25,8 @@ parse.add_argument("-e", "--email", required=True, type=str, help="Set the login
 parse.add_argument("-p", "--password", required=True, type=str, help="Set the login Passwort for Bitchute!")
 parse.add_argument("-v", "--visibly_advice", required=True, type=str, help="Set the Video content view advice for shocking videos! [10, 40 or 70]")
 args = parse.parse_args()
+
+file_backup_folder = os.path.dirname(args.file) + "/"+ "finished_transfer_movies" + "/" + os.path.basename(args.file)
 
 class TestBitchuteUploadClass(object):
   def __init__(self, name, file, thumb, email, password, visibly_advice):
@@ -57,7 +61,7 @@ class TestBitchuteUploadClass(object):
         
      while True:
        try:
-          self.driver.minimize_window()
+          #self.driver.minimize_window()
           self.driver.set_window_size(880, 640)
           self.driver.set_window_position(90, 90)
        except:
@@ -191,5 +195,16 @@ class TestBitchuteUploadClass(object):
 Bitchute = TestBitchuteUploadClass(args.name, args.file, args.thumbnail, args.email, args.password, args.visibly_advice)
 
 Bitchute.setup_method("")
-Bitchute.test_bitchuteUploadClass()
+
+while True:
+   try: 
+      Bitchute.test_bitchuteUploadClass()
+   except:
+      print("Retry Upload")
+   else:
+      print ("Move " + args.file + " to " + file_backup_folder)
+      shutil.move(args.file, file_backup_folder)
+      break
+
 Bitchute.teardown_method("")
+
